@@ -13,8 +13,25 @@ def main(page: ft.Page):
     password_field = ft.TextField(label="Password", text_size=20, read_only=True, expand=True)
     
     # パスワード生成ロジック
+    # 文字制御チェックボックス
+    common_symbols = "!@#$%^&*()_+-=[]{}"
+
+    uppercase_checkbox = ft.Checkbox(label="大文字を含む", value=True)
+    lowercase_checkbox = ft.Checkbox(label="小文字を含む", value=True)
+    digit_checkbox = ft.Checkbox(label="数字を含む", value=True) 
+    symbols_checkbox = ft.Checkbox(label="記号を含む", value=True)
+
     def generate_password(password_length):
-        alphabet = string.ascii_letters + string.digits + string.punctuation
+        alphabet = ""
+        if uppercase_checkbox.value:
+            alphabet += string.ascii_uppercase
+        if lowercase_checkbox.value:
+            alphabet += string.ascii_lowercase
+        if digit_checkbox.value:
+            alphabet += string.digits
+        if symbols_checkbox.value:
+            alphabet += common_symbols
+
         return ''.join(secrets.choice(alphabet) for _ in range(password_length))
 
     # 生成ボタンを押したときの処理
@@ -46,6 +63,16 @@ def main(page: ft.Page):
         ft.Column(
             controls=[
                 ft.Row(controls=[lenght_label, slider]),
+            ],
+        ),
+        ft.Column(
+            controls=[
+                ft.Row(controls=[
+                    uppercase_checkbox,
+                    lowercase_checkbox,
+                    digit_checkbox,
+                    symbols_checkbox,
+                ])
             ],
         ),
         ft.Row(
