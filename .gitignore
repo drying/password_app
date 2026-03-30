@@ -161,3 +161,7 @@ cython_debug/
 
 # Flet
 storage/
+
+# App data
+passwords.json
+passwords.json.bak

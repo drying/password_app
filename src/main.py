@@ -29,9 +29,12 @@ def main(page: ft.Page):
         if not password_field.value:
             page.show_dialog(ft.SnackBar("パスワードがまだ生成されていません！"))
         else:
-            await ft.Clipboard().set(password_field.value)
-            page.show_dialog(ft.SnackBar("パスワードがコピーされました！"))
-        page.update()
+            try:
+                await ft.Clipboard().set(password_field.value)
+                page.show_dialog(ft.SnackBar("パスワードがコピーされました！"))
+            except:
+                page.show_dialog(ft.SnackBar("クリップボードへのコピーに失敗しました"))
+            page.update()
 
     # テキストフィールドのクリア
     def on_clear_click(e):
@@ -43,7 +46,7 @@ def main(page: ft.Page):
 
     # パスワード文字数スライダー
     def password_number_changed(e):
-        lenght_label.value = f"長さ: {int(slider.value)}"
+        length_label.value = f"長さ: {int(slider.value)}"
         page.update()
 
     # UIパーツ
@@ -57,7 +60,7 @@ def main(page: ft.Page):
     symbols_checkbox = ft.Checkbox(label="記号", value=True, label_style=ft.TextStyle(size=16), active_color="#1e95d4")
 
     # 文字数スライダー
-    lenght_label = ft.Text(f"長さ: 12", size=16)
+    length_label  = ft.Text(f"長さ: 12", size=16)
     slider = ft.Slider(min=8, max=20, divisions=12, value=12, active_color="#1e95d4", on_change=password_number_changed)
 
     # ボタン
@@ -71,13 +74,16 @@ def main(page: ft.Page):
     clear_button = ft.Button(content="クリア", width=120, on_click=on_clear_click)
 
     # 初期生成パスワード
-    password_field.value = generate_password(
-        int(slider.value),
-        uppercase_checkbox.value,
-        lowercase_checkbox.value,
-        digit_checkbox.value,
-        symbols_checkbox.value
-    )
+    try:
+        password_field.value = generate_password(
+            int(slider.value),
+            uppercase_checkbox.value,
+            lowercase_checkbox.value,
+            digit_checkbox.value,
+            symbols_checkbox.value
+        )
+    except ValueError:
+        password_field.value = ""
 
     # パスワード生成タブ
     generate_view = ft.Container(
@@ -129,7 +135,7 @@ def main(page: ft.Page):
                     ],
                     alignment=ft.MainAxisAlignment.CENTER
                 ),
-                ft.Row([lenght_label, slider], alignment=ft.MainAxisAlignment.CENTER),
+                ft.Row([length_label , slider], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Container(
                     content=
                     ft.Row([generate_button], alignment=ft.MainAxisAlignment.CENTER, margin=ft.Margin.only(bottom=60))),

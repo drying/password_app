@@ -9,15 +9,28 @@ COMMON_SYMBOLS = "!@#$%^&*()_+-=[]{}"
 # パスワード生成ロジック
 def generate_password(length, use_uppercase, use_lowercase, use_digit, use_symbols):
     alphabet = ""
+    required = []
+
     if use_uppercase:
         alphabet += string.ascii_uppercase
+        required.append(secrets.choice(string.ascii_uppercase))
     if use_lowercase:
         alphabet += string.ascii_lowercase
+        required.append(secrets.choice(string.ascii_lowercase))
     if use_digit:
         alphabet += string.digits
+        required.append(secrets.choice(string.digits))
     if use_symbols:
         alphabet += COMMON_SYMBOLS
+        required.append(secrets.choice(COMMON_SYMBOLS))
+
     if not alphabet:
         raise ValueError("文字の種類を1つ以上選択してください")
-        
-    return ''.join(secrets.choice(alphabet) for _ in range(length))
+    
+    password_chars = required + [secrets.choice(alphabet) for _ in range(length - len(required))]
+
+    for i in range(len(password_chars) - 1, 0, -1):
+        j = secrets.randbelow(i + 1)
+        password_chars[i], password_chars[j] = password_chars[j], password_chars[i] 
+
+    return ''.join(password_chars)
