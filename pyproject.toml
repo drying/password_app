@@ -16,7 +16,7 @@ dev = [
     "flet-cli>=0.82.2",
     "flet-desktop>=0.82.2",
     "flet-web>=0.82.2",
-    "pytest>=9"
+    "pytest>=9.0.0"
 ]
 
 [tool.flet]
