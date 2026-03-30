@@ -1,7 +1,9 @@
 import flet as ft
 from services.password import generate_password
+from services.database import add_password, create_json
 
 def generate_view(page: ft.Page) -> ft.Container:
+    create_json()
 
     # 生成ボタンを押したときの処理
     def on_generate_click(e):
@@ -31,6 +33,37 @@ def generate_view(page: ft.Page) -> ft.Container:
             except:
                 page.show_dialog(ft.SnackBar("クリップボードへのコピーに失敗しました"))
         page.update()
+
+    # 保存ボタンを押したときの処理
+    def on_save_click(e):
+        if not password_field.value:
+            page.show_dialog(ft.SnackBar("パスワードがまだ生成されていません！"))
+            return
+
+        name_field = ft.TextField(label="名前")
+        id_field = ft.TextField(label="ID")
+
+        def on_confirm(e):
+            if not name_field.value.strip():
+                return
+            add_password(name_field.value, id_field.value, password_field.value)
+            page.pop_dialog()
+            page.show_dialog(ft.SnackBar("保存しました"))
+
+        page.show_dialog(ft.AlertDialog(
+            title=ft.Text("パスワードを保存"),
+            content=ft.Column(
+                controls=[name_field, id_field],
+                tight=True,
+                spacing=12,
+                width=300,
+            ),
+            actions=[
+                ft.TextButton("キャンセル", on_click=lambda _: page.pop_dialog()),
+                ft.TextButton("保存", on_click=on_confirm),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        ))
 
     # テキストフィールドのクリア
     def on_clear_click(e):
@@ -68,6 +101,7 @@ def generate_view(page: ft.Page) -> ft.Container:
     )
     copy_button = ft.Button(content="コピー", width=120, on_click=copy_button_click)
     clear_button = ft.Button(content="クリア", width=120, on_click=on_clear_click)
+    save_button = ft.Button(content="保存", width=120, on_click=on_save_click)
 
     # 初期生成パスワード
     try:
@@ -139,7 +173,7 @@ def generate_view(page: ft.Page) -> ft.Container:
                     ft.Row([password_field], alignment=ft.MainAxisAlignment.CENTER)),
                 ft.Container(
                     content=
-                    ft.Row([copy_button, clear_button], alignment=ft.MainAxisAlignment.CENTER, margin=ft.Margin.only(top=10))
+                    ft.Row([copy_button, save_button, clear_button], alignment=ft.MainAxisAlignment.CENTER, margin=ft.Margin.only(top=10))
                 ),
             ],
             spacing=20,
